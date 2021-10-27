@@ -1,0 +1,51 @@
+#%RAML 1.0
+title: "hello"
+types:
+  input: !include exchange_modules/3ce049d6-35db-42c2-9804-b77c389dff68/data-types/1.0.0/data-types.raml
+
+/customers:
+  get:
+    queryParameters:
+      degination:
+        required: false
+        enum:
+          - customers 
+          - wholesales
+    responses:
+      200:
+        body:
+          application/json:
+           type: input[]
+           examples: 
+             output: !include/example/examples.raml
+
+  /{ID}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: input
+              examples:
+                output: !include/example/examples.raml
+
+    post:
+      body:
+        application/json:
+          type: input[]
+          examples:
+            output: !include/example/examples.raml
+        
+    
+         
+       
+          
+        
+        
+                
+        
+          
+      
+          
+        
+      

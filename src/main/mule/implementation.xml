@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="36c41e54-dc4c-409b-af08-a6992505c636" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="admin" database="sys"/>
+	</db:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="7519932b-5641-4a03-8b0a-37f0cdb30b40" >
+		<http:request-connection host="localhost"/>
+	</http:request-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="8ed42065-2a5b-4b50-83ce-5b620e8ebff3" >
+		<file:connection workingDir="C:\Users\kursheed begum\sys-reference\b7" />
+	</file:config>
+	<flow name="getcustomersall" doc:id="ef447d00-babe-4ef7-8066-c1e224dcd0de" >
+		<logger level="INFO" doc:name="Logger" doc:id="43424a50-cdd4-45b4-84a9-fe58c24a1184" message="before database"/>
+		<db:select doc:name="Select" doc:id="0e2d08fa-fdea-4203-ac0d-68f62ed4cac2" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM sys_config;
+]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="f886db17-e051-4e32-b74c-f4508d14a4db" message="after transform message" />
+		<ee:transform doc:name="Transform Message" doc:id="a909302e-7e24-46e4-9b5e-50995de842b2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="b8113728-b210-4916-8f2c-7d5b5a65c4a0" name="implementationFlow1"/>
+		<foreach doc:name="For Each" doc:id="76e86f5b-91f5-4ee9-a120-8d0969bf321a" >
+			<http:request doc:name="Request" doc:id="6366f72e-5daa-4efd-8e57-71ed511e98ea" config-ref="HTTP_Request_configuration" method="POST" path="/azeez"/>
+			<ee:transform doc:name="Transform Message" doc:id="e3405ec8-dee7-415c-9aa2-825eedc9bcef">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="26c73833-bef2-445a-a651-4fbb06bc369e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="7776252c-9d99-46be-9006-da48568fcc88" config-ref="File_Config" path="C:\Users\kursheed begum\sys-reference\New folder\application.json" mode="APPEND"/>
+		<choice doc:name="Choice" doc:id="3f9d8808-c500-4250-8c07-64b331ef5abd">
+			<when expression="#[isEmpty(payload)==true]">
+				<logger level="INFO" doc:name="Logger" doc:id="8d0af7df-bbc3-4f79-bf0e-bdcf5524b9d3" message="value off"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="66e8b1a1-0f1a-4e27-beb5-277041a41aa5" message="value on"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="implementationFlow2" doc:id="08dbf771-fa4a-4d06-a0c2-1585651c47b6" >
+		<http:listener doc:name="Listener" doc:id="579aa1e4-7a27-43e4-b539-e578992d6844" config-ref="mysql-httpListenerConfig" path="/azeez"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7cb6b0fc-c779-4eea-8946-811a800e3e07" message="after logger"/>
+	</flow>
+	<flow name="implementationFlow1" doc:id="18a3faf1-e5ca-4286-9098-1acbebad6e35" >
+		<ee:transform doc:name="Transform Message" doc:id="b30c5e5f-394d-491d-8a7a-5640d44dfb3f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8408db75-0d94-4575-ac9d-77f95c7d8369" message="after transform message"/>
+	</flow>
+	<flow name="implementationFlow" doc:id="54110f0c-e884-4c1a-80c3-a28144c058b6" >
+		<db:select doc:name="Select" doc:id="bb4d94af-05a8-4415-9f21-04b1ec66b1f6" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM sys_config;
+
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{'ID': attributes.uriParams.ID}]]]></db:input-parameters>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="03c98313-9756-4c6b-8a69-084e201f50e9" message="after select"/>
+		<ee:transform doc:name="Transform Message" doc:id="4b47b22e-8c2b-41b0-b9c4-0b1827e1b647" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

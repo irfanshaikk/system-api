@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_54110f0c_e884_4c1a_80c3_a28144c058b6_Output_Payload = {
+  contactname: String, 
+  country: String, 
+  "customer id": Number, 
+  address: String, 
+  city: String, 
+  "postal code": Number, 
+  "customer name": String, 
+  _?: Any
+}
+
