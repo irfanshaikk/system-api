@@ -67,6 +67,7 @@ payload]]></ee:set-payload>
 	<flow name="implementationFlow2" doc:id="08dbf771-fa4a-4d06-a0c2-1585651c47b6" >
 		<http:listener doc:name="Listener" doc:id="579aa1e4-7a27-43e4-b539-e578992d6844" config-ref="mysql-httpListenerConfig" path="/azeez"/>
 		<logger level="INFO" doc:name="Logger" doc:id="7cb6b0fc-c779-4eea-8946-811a800e3e07" message="after logger"/>
+		<logger level="INFO" doc:name="Logger" doc:id="4a9c3a2f-b830-4699-8786-1e2be129bd0b" message="logger-----"/>
 	</flow>
 	<flow name="implementationFlow1" doc:id="18a3faf1-e5ca-4286-9098-1acbebad6e35" >
 		<ee:transform doc:name="Transform Message" doc:id="b30c5e5f-394d-491d-8a7a-5640d44dfb3f" >
